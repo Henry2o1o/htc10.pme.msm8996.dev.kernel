@@ -1,4 +1,4 @@
-/* Copyright (c) 2016, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2016-2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -37,6 +37,8 @@ extern void switch_app_setting_bit(struct task_struct *prev,
 				   struct task_struct *next);
 extern void apply_app_setting_bit(struct file *file);
 extern bool use_app_setting;
+extern bool use_32bit_app_setting;
+extern bool use_32bit_app_setting_pro;
 #endif
 
 #endif
