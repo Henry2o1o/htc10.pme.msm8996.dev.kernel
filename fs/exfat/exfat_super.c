@@ -2636,7 +2636,7 @@ static void exfat_debug_kill_sb(struct super_block *sb)
 }
 #endif /* CONFIG_EXFAT_KERNEL_DEBUG */
 
-static struct file_system_type exfat_fs_type = {
+static struct file_system_type texfat_fs_type = {
 	.owner       = THIS_MODULE,
 #if defined(CONFIG_MACH_LGE) || defined(CONFIG_HTC_BATT)
 	.name        = "texfat",
@@ -2674,7 +2674,7 @@ static int __init init_exfat(void)
 	if (err)
 		goto out;
 
-	err = register_filesystem(&exfat_fs_type);
+	err = register_filesystem(&texfat_fs_type);
 	if (err)
 		goto out;
 
@@ -2687,7 +2687,7 @@ out:
 static void __exit exit_exfat(void)
 {
 	exfat_destroy_inodecache();
-	unregister_filesystem(&exfat_fs_type);
+	unregister_filesystem(&texfat_fs_type);
 	FsShutdown();
 }
 
