@@ -95,6 +95,17 @@ void switch_app_setting_bit(struct task_struct *prev, struct task_struct *next)
 }
 EXPORT_SYMBOL(switch_app_setting_bit);
 
+void switch_32bit_app_setting_bit(struct task_struct *prev,
+					struct task_struct *next)
+{
+	if (prev->mm && unlikely(is_compat_thread(task_thread_info(prev))))
+		clear_app_setting_bit_for_32bit_apps();
+
+	if (next->mm && unlikely(is_compat_thread(task_thread_info(next))))
+		set_app_setting_bit_for_32bit_apps();
+}
+EXPORT_SYMBOL(switch_32bit_app_setting_bit);
+
 void apply_app_setting_bit(struct file *file)
 {
 	bool found = false;
