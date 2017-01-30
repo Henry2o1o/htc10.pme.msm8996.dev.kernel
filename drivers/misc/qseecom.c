@@ -142,11 +142,6 @@ static DEFINE_MUTEX(app_access_lock);
 static DEFINE_MUTEX(clk_access_lock);
 static DEFINE_MUTEX(cmnlib_access_lock);
 
-struct sglist_info {
-	uint32_t indexAndFlags;
-	uint32_t sizeOrCount;
-};
-
 /*
  * The 31th bit indicates only one or multiple physical address inside
  * the request buffer. If it is set,  the index locates a single physical addr
