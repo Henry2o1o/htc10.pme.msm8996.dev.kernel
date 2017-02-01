@@ -36,10 +36,8 @@ static struct acoustic_ops *the_ops = NULL;
 static struct switch_dev sdev_beats;
 static struct switch_dev sdev_dq;
 static struct switch_dev sdev_fm;
-extern struct wake_lock compr_lpa_q6_cb_wakelock;
 static struct wake_lock htc_acoustic_wakelock;
 static struct wake_lock htc_acoustic_wakelock_timeout;
-static struct wake_lock htc_acoustic_tfa_wakelock;
 struct avcs_ctl {
        atomic_t ref_cnt;
        void *apr;
@@ -322,35 +320,12 @@ acoustic_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 				}
 				if (s32_value == 1) {
 					wake_lock_timeout(&htc_acoustic_wakelock, 60*HZ);
-//					D("%s %d: wake_unlock compr_lpa_q6_cb_wakelock\n", __func__, __LINE__);
-					wake_unlock(&compr_lpa_q6_cb_wakelock );
 				} else {
 					wake_lock_timeout(&htc_acoustic_wakelock_timeout, 1*HZ);
 					wake_unlock(&htc_acoustic_wakelock);
 				}
 			} else {
 				E("%s %d: ACOUSTIC_CONTROL_WAKELOCK error.\n", __func__, __LINE__);
-				rc = -EINVAL;
-			}
-			break;
-		}
-		case ACOUSTIC_TFA_CONTROL_WAKELOCK: {
-			if(sizeof(s32_value) <= us32_size) {
-				memcpy((void*)&s32_value, (void*)buf, sizeof(s32_value));
-//				D("%s %d: ACOUSTIC_TFA_CONTROL_WAKELOCK %#x\n", __func__, __LINE__, s32_value);
-				if (s32_value < -1 || s32_value > 1) {
-					rc = -EINVAL;
-					break;
-				}
-				if (s32_value == 1) {
-//					D("%s %d: hold wakelock for tfa extra mi2s\n", __func__, __LINE__);
-					wake_lock_timeout(&htc_acoustic_tfa_wakelock, 15*HZ);
-				} else {
-//					D("%s %d: release wakelock for tfa extra mi2s\n", __func__, __LINE__);
-					wake_unlock(&htc_acoustic_tfa_wakelock);
-				}
-			} else {
-				E("%s %d: ACOUSTIC_TFA_CONTROL_WAKELOCK error.\n", __func__, __LINE__);
 				rc = -EINVAL;
 			}
 			break;
@@ -470,7 +445,6 @@ static int __init acoustic_init(void)
 	ret = misc_register(&acoustic_misc);
 	wake_lock_init(&htc_acoustic_wakelock, WAKE_LOCK_SUSPEND, "htc_acoustic");
 	wake_lock_init(&htc_acoustic_wakelock_timeout, WAKE_LOCK_SUSPEND, "htc_acoustic_timeout");
-	wake_lock_init(&htc_acoustic_tfa_wakelock, WAKE_LOCK_SUSPEND, "htc_acoustic_tfa");
 
 	if (ret < 0) {
 		pr_err("failed to register misc device!\n");

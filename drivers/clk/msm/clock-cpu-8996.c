@@ -39,7 +39,7 @@
 #include <dt-bindings/clock/msm-clocks-8996.h>
 
 #include "clock.h"
-#include "vdd-level-8994.h"
+#include "vdd-level-8996.h"
 
 enum {
 	APC0_PLL_BASE,
@@ -676,7 +676,7 @@ static int cpu_clk_8996_set_rate(struct clk *c, unsigned long rate)
 {
 	struct cpu_clk_8996 *cpuclk = to_cpu_clk_8996(c);
 	int ret, err_ret;
-	unsigned long alt_pll_prev_rate;
+	unsigned long alt_pll_prev_rate = 0;
 	unsigned long alt_pll_rate;
 	unsigned long n_alt_freqs = cpuclk->n_alt_pll_freqs;
 	bool on_acd_leg = rate > MAX_PLL_MAIN_FREQ;
@@ -1485,6 +1485,44 @@ static struct platform_driver cpu_clock_8996_driver = {
 		.owner = THIS_MODULE,
 	},
 };
+
+ssize_t vc_get_vdd(char *buf)
+{
+	struct dev_pm_opp *opppoop;
+        struct clk *c5;
+        int i, len = 0, levels = 0;
+
+        c5 = &pwrcl_clk.c;
+        levels = c5->vdd_class->num_levels;
+
+	rcu_read_lock();
+        if (buf) {
+                for(i=1; i < levels; i++) {
+			opppoop = dev_pm_opp_find_freq_exact(get_cpu_device(0),
+				c5->fmax[i], true);
+                        len += sprintf(buf + len, "%umhz: %d mV\n",
+                                (unsigned int)c5->fmax[i]/1000000,
+                                (int)dev_pm_opp_get_voltage(opppoop)/1000 );
+                }
+        }
+
+        c5 = &perfcl_clk.c;
+        levels = c5->vdd_class->num_levels;
+
+        if (buf) {
+                for(i=1; i < levels; i++) {
+			opppoop = dev_pm_opp_find_freq_exact(get_cpu_device(2),
+				c5->fmax[i], true);
+                        len += sprintf(buf + len, "%umhz: %d mV\n",
+                                (unsigned int)c5->fmax[i]/1000000,
+                                (int)dev_pm_opp_get_voltage(opppoop)/1000 );
+                }
+        }
+	rcu_read_unlock();
+
+        return len;
+}
+
 
 static int __init cpu_clock_8996_init(void)
 {

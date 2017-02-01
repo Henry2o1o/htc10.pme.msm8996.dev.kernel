@@ -520,12 +520,11 @@ static void __cpufreq_interactive_timer(unsigned long data, bool is_notif)
 		} else {
 			new_freq = choose_freq(ppol, loadadjfreq);
 
-			if (new_freq < tunables->hispeed_freq)
-				new_freq = tunables->hispeed_freq;
-			else
-				new_freq = max(new_freq,
-					       tunables->hispeed_freq);
+			new_freq = max(new_freq,
+			       tunables->hispeed_freq);
 		}
+	} else {
+		new_freq = choose_freq(ppol, loadadjfreq);
 	}
 
 	if ((!tunables->ignore_hispeed_on_notif || !is_notif) &&
@@ -1301,11 +1300,11 @@ show_store_gov_pol_sys(enable_prediction);
 
 #define gov_sys_attr_rw(_name)						\
 static struct global_attr _name##_gov_sys =				\
-__ATTR(_name, 0644, show_##_name##_gov_sys, store_##_name##_gov_sys)
+__ATTR(_name, 0664, show_##_name##_gov_sys, store_##_name##_gov_sys)
 
 #define gov_pol_attr_rw(_name)						\
 static struct freq_attr _name##_gov_pol =				\
-__ATTR(_name, 0644, show_##_name##_gov_pol, store_##_name##_gov_pol)
+__ATTR(_name, 0664, show_##_name##_gov_pol, store_##_name##_gov_pol)
 
 #define gov_sys_pol_attr_rw(_name)					\
 	gov_sys_attr_rw(_name);						\
