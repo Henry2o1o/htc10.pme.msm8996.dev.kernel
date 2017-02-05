@@ -6675,9 +6675,6 @@ sd_init(struct sched_domain_topology_level *tl,
 #endif
 	};
 
-	cpumask_and(sched_domain_span(sd), cpu_map, tl->mask(cpu));
-	sd_id = cpumask_first(sched_domain_span(sd));
-
 	/*
 	 * Convert topological properties into behaviour.
 	 */
